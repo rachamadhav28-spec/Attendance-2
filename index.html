@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B.Tech Attendance Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area">
+        <i class="fa-solid fa-graduation-cap logo-icon"></i>
+        <div>
+          <h1>B.Tech Attendance Tracker</h1>
+          <p class="subtitle">MGU CSE-A • Daily 6 Classes Setup</p>
+        </div>
+      </div>
+      <div class="header-badge" id="headerPercentageBadge">
+        <span class="badge-label">Overall</span>
+        <span class="badge-value" id="headerPctValue">0.0%</span>
+      </div>
+    </header>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+      <button class="tab-btn" onclick="switchTab('logger')"><i class="fa-solid fa-calendar-check"></i> Daily Logger</button>
+      <button class="tab-btn" onclick="switchTab('manualEdit')"><i class="fa-solid fa-pen-to-square"></i> Edit Counts</button>
+      <button class="tab-btn" onclick="switchTab('bunkCalc')"><i class="fa-solid fa-calculator"></i> Bunk Calc</button>
+      <button class="tab-btn" onclick="switchTab('history')"><i class="fa-solid fa-clock-rotate-left"></i> History</button>
+      <button class="tab-btn" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i> Settings</button>
+    </nav>
+
+    <main class="main-content">
+      <!-- Dashboard Tab -->
+      <section id="tab-dashboard" class="tab-content active">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon blue"><i class="fa-solid fa-clipboard-list"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-title">Total Conducted</span>
+              <span class="kpi-value" id="kpiConducted">0</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon green"><i class="fa-solid fa-user-check"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-title">Total Attended</span>
+              <span class="kpi-value" id="kpiAttended">0</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon red"><i class="fa-solid fa-user-xmark"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-title">Total Missed</span>
+              <span class="kpi-value" id="kpiMissed">0</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="fa-solid fa-percent"></i></div>
+            <div class="kpi-info">
+              <span class="kpi-title">Overall Percentage</span>
+              <span class="kpi-value" id="kpiPercentage">0.0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-banner" id="statusBanner">
+          <i class="fa-solid fa-circle-info"></i>
+          <span id="statusBannerText">Log your attendance daily to keep track of your performance.</span>
+        </div>
+
+        <h2 class="section-title"><i class="fa-solid fa-book"></i> Subject Wise Breakdown</h2>
+        <div class="subject-grid" id="subjectCardsGrid"></div>
+      </section>
+
+      <!-- Daily Logger Tab -->
+      <section id="tab-logger" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-calendar-day"></i> Select Date to Log Attendance</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group date-picker-group">
+              <label for="logDate">Date:</label>
+              <input type="date" id="logDate" class="input-field" onchange="loadDaySchedule()">
+              <button class="btn btn-secondary" onclick="setTodayDate()"><i class="fa-solid fa-calendar-today"></i> Set Today</button>
+            </div>
+            <div id="dayInfoText" class="day-info-text"></div>
+            <div id="loggerSlotsContainer" class="slots-container"></div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="saveDailyAttendance()"><i class="fa-solid fa-floppy-disk"></i> Save Day's Log</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Manual Edit Tab -->
+      <section id="tab-manualEdit" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-sliders"></i> Edit Attended & Missed Counts Directly</h2>
+            <p>Directly adjust cumulative class counts for each subject.</p>
+          </div>
+          <div class="card-body">
+            <div id="manualEditContainer" class="manual-edit-grid"></div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="saveManualCounts()"><i class="fa-solid fa-check"></i> Update Cumulative Counts</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bunk Calculator Tab -->
+      <section id="tab-bunkCalc" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-calculator"></i> Smart Bunk & Target Calculator</h2>
+          </div>
+          <div class="card-body">
+            <div id="bunkAnalysisCards" class="bunk-cards-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- History Tab -->
+      <section id="tab-history" class="tab-content">
+        <div class="card">
+          <div class="card-header flex-header">
+            <h2><i class="fa-solid fa-list-check"></i> Attendance History Log</h2>
+            <button class="btn btn-danger-outline" onclick="clearAllHistory()"><i class="fa-solid fa-trash-can"></i> Clear All History</button>
+          </div>
+          <div class="card-body">
+            <div id="historyTableContainer"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section id="tab-settings" class="tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fa-solid fa-gear"></i> Preferences & Subjects</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="targetThreshold">Target Attendance Percentage (%):</label>
+              <input type="number" id="targetThreshold" class="input-field" min="50" max="100" value="75">
+            </div>
+            <h3 class="subsection-title"><i class="fa-solid fa-book-bookmark"></i> Configured Subjects</h3>
+            <div id="settingsSubjectList" class="settings-subject-list"></div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="saveSettings()"><i class="fa-solid fa-floppy-disk"></i> Save Settings</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
