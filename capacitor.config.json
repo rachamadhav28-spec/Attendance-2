@@ -1,0 +1,6 @@
+{
+  "appId": "com.btech.attendancetracker",
+  "appName": "Attendance Tracker",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
